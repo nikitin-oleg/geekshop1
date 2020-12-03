@@ -20,12 +20,6 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} ({self.category.name})"
 
-class LinksMenu(models.Model):
-    href = models.CharField(verbose_name='категория', max_length=128)
-    name = models.CharField(verbose_name='название', max_length=128)
-
-    def __str__(self):
-        return f"{self.href} ({self.name})"
 
 class Contacts(models.Model):
     city = models.CharField(verbose_name='город', max_length=64)

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import datetime
-from .models import ProductCategory, Product, LinksMenu, Contacts
+from .models import ProductCategory, Product, Contacts
 
 
 def main(request):
@@ -13,87 +13,17 @@ def main(request):
 def products(request, pk=None):
     print(pk)
     title = 'продукты'
-    links_menu = LinksMenu.objects.all()
-    # same_products = SameProducts.objects.all()
+    links_menu = ProductCategory.objects.all()
+    same_products = Product.objects.all()
 
     content = {
         'title': title,
         'links_menu': links_menu,
-        # 'same_products': same_products
+        'same_products': same_products
     }
     return render(request, 'mainapp/products.html', content)
 
 
-# def contact(request):
-#     content = {
-#         'title': 'Контакты',
-#     }
-#     return render(request, 'mainapp/contact.html', content)
-
-
-def products_all(request):
-    title = 'продукты'
-    links_menu = LinksMenu.objects.all()
-    # same_products = SameProducts.objects.all()
-
-    content = {
-        'title': title,
-        'links_menu': links_menu,
-        # 'same_products': same_products
-    }
-    return render(request, 'mainapp/products.html', content)
-
-
-def products_home(request):
-    title = 'продукты'
-    links_menu = LinksMenu.objects.all()
-    # same_products = SameProducts.objects.all()
-
-    content = {
-        'title': title,
-        'links_menu': links_menu,
-        # 'same_products': same_products
-    }
-    return render(request, 'mainapp/products.html', content)
-
-
-def products_office(request):
-    title = 'продукты'
-    links_menu = LinksMenu.objects.all()
-    # same_products = SameProducts.objects.all()
-
-    content = {
-        'title': title,
-        'links_menu': links_menu,
-        # 'same_products': same_products
-    }
-    return render(request, 'mainapp/products.html', content)
-
-
-def products_modern(request):
-    title = 'продукты'
-    links_menu = LinksMenu.objects.all()
-    # same_products = SameProducts.objects.all()
-
-    content = {
-        'title': title,
-        'links_menu': links_menu,
-        # 'same_products': same_products
-    }
-    return render(request, 'mainapp/products.html', content)
-
-
-def products_classic(request):
-    title = 'продукты'
-    links_menu = LinksMenu.objects.all()
-    # same_products = SameProducts.objects.all()
-
-    content = {
-        'title': title,
-        'links_menu': links_menu,
-        # 'same_products': same_products
-    }
-    return render(request, 'mainapp/products.html', content)
 
 
 def contact(request):
