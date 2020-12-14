@@ -5,7 +5,8 @@
         </a>
     </li>
     <li>
-        <a href="{% url 'products:index' %}" class="{% if request.resolver_match.url_name == 'products' %}active{% endif %}">
+        <a href="{% url 'products:index' %}"
+           class="{% if request.resolver_match.url_name == 'products' %}active{% endif %}">
             продукты
         </a>
     </li>
@@ -17,23 +18,30 @@
     {% if user.is_authenticated %}
     <li>
         <a href="{% url 'auth:edit' %}">
-            {% if  user.first_name %}{{ user.first_name }}{% else %}Пользователь{% endif %}
+            {% if user.first_name %}{{ user.first_name }}{% else %} Пользователь {% endif %}
         </a>
     </li>
     {% endif %}
     {% if user.is_authenticated %}
     <li>
-        <a href="{% url 'auth:logout' %}" >
-            выход
-        </a>
+        <a href="{% url 'auth:logout' %}"> выход  </a>
     </li>
     {% else %}
-        <li>
-        <a href="{% url 'auth:login' %}">
-            вход
-        </a>
+    <li>
+        <a href="{% url 'auth:login' %}"> вход </a>
     </li>
     {% endif %}
+    {% if user.is_authenticated %}
+<!--    <li>-->
+<!--        <a href="{% url 'auth:edit' %}"> {{ user.first_name|default:'Пользователь' }} </a>-->
+<!--    </li>-->
+    {% endif %}
+    {% if user.is_superuser %}
+        <li>
+            <a href="{% url 'admin:users' %}">админка</a>
+        </li>
+    {% endif %}
+
 </ul>
 <a href="#" class="search"></a>
 <a href="{% url 'basket:basket' %}" class="basket">
