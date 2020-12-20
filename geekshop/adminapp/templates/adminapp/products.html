@@ -8,7 +8,7 @@
         <a href="{% url 'admin:product_create' category.pk %}"> новый продукт </a>
     </button>
 
-    {% for object in objects %}
+    {% for object in object_list %}
     <div class="product_record">
         {% if not object.is_active %}
             not_active

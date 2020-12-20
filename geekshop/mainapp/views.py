@@ -9,11 +9,7 @@ import random
 from basketapp.models import Basket
 
 
-def get_basket(user):
-    if user.is_authenticated:
-        return Basket.objects.filter(user=user)
-    else:
-        return []
+
 
 
 def get_hot_product():
@@ -31,7 +27,10 @@ def get_same_products(hot_product):
 def main(request):
     title = 'главная'
     products = Product.objects.all()[:4]
-    content = {'title': title, 'products': products, 'basket': get_basket(request.user),}
+    content = {
+        'title': title,
+        'products': products,
+    }
     return render(request, 'mainapp/index.html', content)
 
 
@@ -39,10 +38,6 @@ def products(request, pk=None, page=1):
 
     title = 'продукты'
     links_menu = ProductCategory.objects.all()
-    basket = get_basket(request.user)
-    if request.user.is_authenticated:
-        basket = Basket.objects.filter(user=request.user)
-
 
     if pk is not None:
         if pk == 0:
@@ -65,7 +60,6 @@ def products(request, pk=None, page=1):
             'links_menu': links_menu,
             'category': category,
             'products': products_paginator,
-            'basket': get_basket(request.user),
         }
 
         return render(request, 'mainapp/products_list.html', content)
@@ -78,7 +72,6 @@ def products(request, pk=None, page=1):
         'links_menu': links_menu,
         'hot_product': hot_product,
         'same_products': same_products,
-        'basket': get_basket(request.user),
     }
 
     return render(request, 'mainapp/products.html', content)
@@ -92,7 +85,6 @@ def contact(request):
         'title': title,
         'visit_date': visit_date,
         'locations': locations,
-        'basket': get_basket(request.user),
     }
     return render(request, 'mainapp/contact.html', content)
 
@@ -104,7 +96,6 @@ def product(request, pk):
         'title': title,
         'links_menu': ProductCategory.objects.all(),
         'product': get_object_or_404(Product, pk=pk),
-        'basket': get_basket(request.user),
     }
 
     return render(request, 'mainapp/product.html', content)
