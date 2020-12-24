@@ -384,20 +384,21 @@ class ProductDetailView(DetailView):
 
 class ProductUpdateView(UpdateView):
     model = Product
-    template_name = 'adminapp/product_update.html'
-    success_url = reverse_lazy('admin:products')
+    # template_name = 'adminapp/product_update.html'
+    # success_url = reverse_lazy('admin:products')
     form_class = ProductEditForm
 
-    def get_context_data(self, *args, **kwargs):
-        context_data = super().get_context_data(*args, **kwargs)
-        category_pk = self.kwargs["pk"]
-        category_item = get_object_or_404(ProductCategory, pk=category_pk)
-        context_data['category'] = category_item
-        return context_data
+    # def get_context_data(self, *args, **kwargs):
+    #     context_data = super().get_context_data(*args, **kwargs)
+    #     category_pk = self.kwargs["pk"]
+    #     category_item = get_object_or_404(ProductCategory, pk=category_pk)
+    #     context_data['category'] = category_item
+    #     return context_data
 
     def get_success_url(self):
-        category_pk = self.kwargs["pk"]
-        success_url = reverse('adminapp:products', args=[category_pk])
+        pk = self.kwargs["pk"]
+        product_item = Product.objects.get(pk=pk)
+        success_url = reverse('adminapp:products', args=[product_item.category__pk])
         return success_url
 
 
