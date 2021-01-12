@@ -4,6 +4,15 @@ from django.conf import settings
 from mainapp.models import Product
 
 
+# class OrderItemQuerySet(models.QuerySet):
+#
+#     def delete(self, *args, **kwargs):
+#         for object in self:
+#             object.product.quantity += object.quantity
+#             object.product.save()
+#         super(OrderItemQuerySet, self).delete(*args, **kwargs)
+
+
 class Order(models.Model):
     FORMING = 'FM'
     SENT_TO_PROCEED = 'STP'
@@ -50,20 +59,38 @@ class Order(models.Model):
         return sum(list(map(lambda x: x.quantity * x.product.price, items)))
 
     # переопределяем метод, удаляющий объект
-    def delete(self):
-        for item in self.orderitems.select_related():
-            item.product.quantity += item.quantity
-            item.product.save()
+    # def delete(self):
+    #     for item in self.orderitems.select_related():
+    #         item.product.quantity += item.quantity
+    #         item.product.save()
+    #
+    #     self.is_active = False
+    #     self.save()
 
-        self.is_active = False
-        self.save()
+    @staticmethod
+    def get_item(pk):
+        return OrderItem.objects.get(pk=pk)
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="orderitems", verbose_name='заказ', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name='продукт', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(verbose_name='количество', default=0)
+    # objects = OrderItemQuerySet.as_manager()
 
     @property
     def product_cost(self):
         return self.product.price * self.quantity
+
+    # def delete(self):
+    #     self.product.quantity += self.quantity
+    #     self.product.save()
+    #     super(self.__class__, self).delete()
+    #
+    # def save(self, *args, **kwargs):
+    #     if self.pk:
+    #         self.product.quantity -= self.quantity - self.__class__.get_item(self.pk).quantity
+    #     else:
+    #         self.product.quantity -= self.quantity
+    #     self.product.save()
+    #     super(self.__class__, self).save(*args, **kwargs)

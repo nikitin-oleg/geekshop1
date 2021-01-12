@@ -10,8 +10,11 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 
 from basketapp.models import Basket
+from mainapp.models import Product
 from ordersapp.models import Order, OrderItem
 from ordersapp.forms import OrderItemForm
+from django.dispatch import receiver
+from django.db.models.signals import pre_save, pre_delete
 
 
 class OrderList(ListView):
@@ -41,10 +44,10 @@ class OrderItemsCreate(CreateView):
                 for num, form in enumerate(formset.forms):
                     form.initial['product'] = basket_items[num].product
                     form.initial['quantity'] = basket_items[num].quantity
+                    form.initial['price'] = basket_items[num].product.price
                 basket_items.delete()
             else:
                 formset = OrderFormSet()
-
 
         data['orderitems'] = formset
         return data
@@ -80,10 +83,26 @@ class OrderItemsUpdate(UpdateView):
                                              extra=1)
         if self.request.POST:
             formset = OrderFormSet(self.request.POST, instance=self.object)
+            # for form in formset.forms:
+            #     if form.instance.pk:
+            #         form.initial['price'] = form.instance.product.price
+            data['orderitems'] = formset
         else:
             formset = OrderFormSet(instance=self.object)
+            for form in formset.forms:
+                if form.instance.pk:
+                    form.initial['price'] = form.instance.product.price
+            data['orderitems'] = formset
 
-        data['orderitems'] = formset
+            # for form in formset.forms:
+            #     product = Product.objects.filter(pk=form.instance.product_id)
+            #     if product:
+            #         form.initial['price'] = product.first().price
+
+            # data['orderitems'] = OrderFormSet(instance=self.object)
+
+        #
+        # data['orderitems'] = formset
 
         return data
 
@@ -119,8 +138,26 @@ class OrderRead(DetailView):
 
 
 def order_forming_complete(request, pk):
-   order = get_object_or_404(Order, pk=pk)
-   order.status = Order.SENT_TO_PROCEED
-   order.save()
+    order = get_object_or_404(Order, pk=pk)
+    order.status = Order.SENT_TO_PROCEED
+    order.save()
 
-   return HttpResponseRedirect(reverse('ordersapp:orders_list'))
+    return HttpResponseRedirect(reverse('ordersapp:orders_list'))
+
+
+@receiver(pre_save, sender=OrderItem)
+@receiver(pre_save, sender=Basket)
+def product_quantity_update_save(sender, update_fields, instance, **kwargs):
+    if update_fields is 'quantity' or 'product':
+        if instance.pk:
+            instance.product.quantity -= instance.quantity - sender.get_item(instance.pk).quantity
+        else:
+            instance.product.quantity -= instance.quantity
+        instance.product.save()
+
+
+@receiver(pre_delete, sender=OrderItem)
+@receiver(pre_delete, sender=Basket)
+def product_quantity_update_delete(sender, instance, **kwargs):
+    instance.product.quantity += instance.quantity
+    instance.product.save()
