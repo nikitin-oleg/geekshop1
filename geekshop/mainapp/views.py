@@ -9,9 +9,6 @@ import random
 from basketapp.models import Basket
 
 
-
-
-
 def get_hot_product():
     products_list = Product.objects.all()
 
@@ -26,7 +23,9 @@ def get_same_products(hot_product):
 
 def main(request):
     title = 'главная'
-    products = Product.objects.all()[:4]
+    # products = Product.objects.all()[:4]
+    products = Product.objects.filter(is_active=True, category__is_active=True).select_related('category')[:3]
+
     content = {
         'title': title,
         'products': products,
@@ -35,7 +34,6 @@ def main(request):
 
 
 def products(request, pk=None, page=1):
-
     title = 'продукты'
     links_menu = ProductCategory.objects.all()
 
@@ -45,7 +43,8 @@ def products(request, pk=None, page=1):
             category = {'name': 'все', 'pk': 0}
         else:
             category = get_object_or_404(ProductCategory, pk=pk)
-            products = Product.objects.filter(category__pk=pk, is_active=True, category__is_active=True).order_by('price')
+            products = Product.objects.filter(category__pk=pk, is_active=True, category__is_active=True).order_by(
+                'price')
 
         paginator = Paginator(products, 2)
         try:
